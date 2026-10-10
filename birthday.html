@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday, My Love</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="bear" data-teddy="banner"></div>
+    <h1>Happy Birthday, My Favorite Person!</h1>
+    <p>Two little letters are waiting for you &hearts; tap an envelope to open it</p>
+  </header>
+
+  <section>
+    <div class="letters">
+      <div class="env-wrap">
+        <button class="envelope" id="env1" aria-label="Open letter: Open When You Need a Smile">
+          <span class="paper"></span><span class="pocket"></span><span class="flap"></span><span class="seal">&hearts;</span>
+        </button>
+        <div class="env-label">Open When You Need a Smile</div>
+        <div class="env-hint">tap to open</div>
+      </div>
+      <div class="env-wrap">
+        <button class="envelope lav" id="env2" aria-label="Open letter: A Little Letter From My Heart">
+          <span class="paper"></span><span class="pocket"></span><span class="flap"></span><span class="seal">&hearts;</span>
+        </button>
+        <div class="env-label">A Little Letter From My Heart</div>
+        <div class="env-hint">tap to open</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Our Little Memory Corner</h2>
+    <!-- To use your own photo: save it in this folder as  our-photo.jpg
+         (for a PNG, save it as our-photo.png and change the src below). -->
+    <figure class="frame empty" id="frame">
+      <img id="memory" src="our-photo.jpg" alt="A photo of us">
+      <div class="ph">
+        <div class="big">&hearts;</div>
+        <div>Place your favorite photo here</div>
+        <small>save it as <b>our-photo.jpg</b> next to this page</small>
+      </div>
+    </figure>
+    <p class="caption">One of my favorite people, one of my favorite memories.</p>
+  </section>
+
+  <section class="final">
+    <div class="bear" id="finalBear" data-teddy="hug"></div>
+    <h2>Happy Birthday, Sweetheart!</h2>
+    <p>You make ordinary moments feel special, and I hope today brings you as much happiness as you bring into my life. Keep smiling, keep shining, and never forget how loved you are.</p>
+    <button class="btn" id="hug">Send You a Hug</button>
+  </section>
+</main>
+
+<!-- letters -->
+<div class="modal" id="modal1" role="dialog" aria-modal="true" aria-label="Open When You Need a Smile">
+  <div class="letter">
+    <button class="close" aria-label="Close letter">&times;</button>
+    <h3>Open When You Need a Smile</h3>
+    <p>My love,</p>
+    <p>If you are reading this, maybe today feels a little heavy, and I wish I could be right there to squeeze your hand. So let me remind you of something I never want you to forget: you are one of the most special people I have ever known.</p>
+    <p>You have a way of making everything feel lighter. Your laugh, your kindness, the little things you do without even noticing &mdash; they have made my life so much warmer and happier than it was before you walked into it.</p>
+    <p>When the world feels too loud, think of us being silly together, and let that make you smile. You mean the whole world to me, and I am so proud of the person you are.</p>
+    <p class="end">You deserve all the happiness in the world. I love you so much!</p>
+    <button class="btn close-big">Close this letter</button>
+  </div>
+</div>
+
+<div class="modal" id="modal2" role="dialog" aria-modal="true" aria-label="A Little Letter From My Heart">
+  <div class="letter lavender">
+    <button class="close" aria-label="Close letter">&times;</button>
+    <h3>A Little Letter From My Heart</h3>
+    <p>Dear Sweetheart,</p>
+    <p>Thank you. For the quiet moments, for the loud and giggly ones, for listening, and for being exactly yourself. I am grateful for you in a hundred small ways every single day.</p>
+    <p>I admire how gentle your heart is and how bright you shine without even trying. Being around you feels like coming home, and I never take that for granted.</p>
+    <p>I dream about all the little adventures ahead of us &mdash; sunny walks, late-night talks, silly photos, and plenty of cozy days that turn into our favorite stories.</p>
+    <p class="end">No matter how many birthdays come and go, I hope I get to make more beautiful memories with you. I love you!</p>
+    <button class="btn soft close-big">Close this letter</button>
+  </div>
+</div>
+
+<!-- hug -->
+<div class="hug-overlay" id="hugBox">
+  <div class="bear" id="hugBear" data-teddy="hug"></div>
+  <h2>Sending you the biggest virtual hug!</h2>
+  <p>(tap anywhere to close)</p>
+</div>
+
+<script src="script.js"></script>
+<script>
+// ----- envelopes & letters -----
+function setupLetter(envId, modalId) {
+  const env = document.getElementById(envId), modal = document.getElementById(modalId);
+  const close = () => { modal.classList.remove('show'); env.classList.remove('open'); };
+  env.addEventListener('click', () => {
+    env.classList.add('open');
+    const r = env.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + 20, 14);
+    setTimeout(() => { modal.classList.add('show'); modal.querySelector('.letter').scrollTop = 0; }, 950);
+  });
+  modal.querySelectorAll('.close, .close-big').forEach(b => b.addEventListener('click', close));
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+}
+setupLetter('env1', 'modal1');
+setupLetter('env2', 'modal2');
+
+// ----- photo: show the placeholder until our-photo.jpg exists -----
+const img = document.getElementById('memory'), frame = document.getElementById('frame');
+const showPhoto = () => frame.classList.remove('empty');
+img.addEventListener('load', showPhoto);
+img.addEventListener('error', () => frame.classList.add('empty'));
+if (img.complete && img.naturalWidth) showPhoto();
+
+// ----- hug -----
+const hugBox = document.getElementById('hugBox');
+function playHug(el) {            // restart the open-wide / close-in arm animation
+  el.classList.remove('hugging'); void el.offsetWidth; el.classList.add('hugging');
+}
+document.getElementById('hug').addEventListener('click', e => {
+  hugBox.classList.add('show');
+  playHug(document.getElementById('finalBear')); playHug(document.getElementById('hugBear'));
+  for (let i = 0; i < 4; i++) setTimeout(() => burst(innerWidth * (.2 + Math.random() * .6), innerHeight * (.3 + Math.random() * .4), 18), i * 300);
+  clearTimeout(hugBox.t); hugBox.t = setTimeout(() => hugBox.classList.remove('show'), 4500);
+});
+hugBox.addEventListener('click', () => hugBox.classList.remove('show'));
+</script>
+</body>
+</html>

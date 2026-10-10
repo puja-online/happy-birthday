@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Little Question</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="ask">
+  <div class="bear" data-teddy="heart" style="width:min(220px,55vw)"></div>
+  <h1>Will you be my boyfriend?</h1>
+  <p class="small">I made this just for you &hearts;</p>
+  <div class="answers">
+    <button class="btn" id="yes">YES</button>
+    <button class="btn" id="no">NO</button>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+<script>
+const yes = document.getElementById('yes'), no = document.getElementById('no'), toast = document.getElementById('toast');
+let noClicks = 0, last = null, leaving = false;
+const labels = ['NO', 'Are you sure?', 'Think again…', 'Pretty please?', 'Still no?', 'Nope 🙈'];
+
+// ---- YES: little celebration, then a smooth trip to the cake page, then the birthday page ----
+yes.addEventListener('click', () => {
+  if (leaving) return; leaving = true;
+  const r = yes.getBoundingClientRect();
+  burst(r.left + r.width / 2, r.top + r.height / 2, 36);
+  setTimeout(() => burst(innerWidth / 2, innerHeight / 3, 40), 250);
+  setTimeout(() => burst(innerWidth / 3, innerHeight / 2, 30), 500);
+  goTo('cake.html');
+});
+
+// ---- NO: runs away on every click; opens surprise tabs on clicks 2 and 3 ----
+function moveNo() {
+  const w = no.offsetWidth, h = no.offsetHeight, m = 10;
+  if (!no.classList.contains('run')) {      // keep it where it is, then let it fly
+    const r = no.getBoundingClientRect();
+    const spacer = document.createElement('span');   // hold the gap in the layout
+    spacer.style.cssText = `display:inline-block;width:${w}px;height:${h}px`;
+    no.parentNode.insertBefore(spacer, no);
+    no.style.left = r.left + 'px'; no.style.top = r.top + 'px';
+    no.classList.add('run');
+    last = { x: r.left, y: r.top };
+    no.getBoundingClientRect();             // flush so the transition runs
+  }
+  let x, y, tries = 0;
+  do {
+    x = m + Math.random() * Math.max(1, innerWidth - w - 2 * m);
+    y = m + Math.random() * Math.max(1, innerHeight - h - 2 * m);
+  } while (tries++ < 20 && Math.hypot(x - last.x, y - last.y) < 140);
+  last = { x, y };
+  no.style.left = x + 'px'; no.style.top = y + 'px';
+}
+function say(msg) {
+  toast.textContent = msg; toast.classList.add('show');
+  clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+no.addEventListener('click', e => {
+  e.preventDefault();
+  noClicks++;
+  moveNo();
+  no.textContent = labels[Math.min(noClicks, labels.length - 1)];
+  yes.style.transform = `scale(${Math.min(1 + noClicks * 0.12, 1.7)})`;   // YES gets bigger & more tempting
+
+  if (noClicks === 3) {   // third NO: the grumpy teddy tab
+    const tab = window.open('angry.html', '_blank');
+    if (!tab) say("How dare you type NO?! Click YES, please 💗");
+  }
+});
+</script>
+</body>
+</html>
